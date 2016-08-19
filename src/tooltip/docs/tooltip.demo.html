@@ -34,8 +34,8 @@
       <input type="text" class="form-control" data-placement="right" data-type="info" data-container="body" placeholder="Focus to toggle tooltip" data-trigger="focus" bs-tooltip="tooltip">
     </div>
     <div class="checkbox">
-      <label data-placement="bottom-left" data-type="info" data-animation="am-fade-and-scale" bs-tooltip="tooltip">
-        <input type="checkbox" ng-model="tooltip.checked"> Remember me
+      <label data-placement="bottom-left" data-type="info" data-animation="am-fade-and-scale" bs-tooltip="tooltip" bs-enabled="tooltip.checked">
+        <input type="checkbox" ng-model="tooltip.checked" > Check me to enable my tooltip
       </label>
     </div>
 
@@ -84,13 +84,16 @@
           <td>placement</td>
           <td>string</td>
           <td>'top'</td>
-          <td>how to position the tooltip - top | bottom | left | right, or any combination like bottom-left.</td>
+          <td>
+            how to position the tooltip - top | bottom | left | right | auto, or any combination like bottom-left or auto bottom-left.<br>
+            When "auto" is specified, it will dynamically reorient the tooltip. For example, if placement is "auto left", the tooltip will display to the left when possible, otherwise it will display right.
+          </td>
         </tr>
         <tr>
           <td>trigger</td>
           <td>string</td>
           <td>'hover focus'</td>
-          <td>how tooltip is triggered - click | hover | focus | manual</td>
+          <td>how tooltip is triggered - click | hover | focus | contextmenu | manual</td>
         </tr>
         <tr>
           <td>title</td>
@@ -135,15 +138,23 @@
         </tr>
         <tr>
           <td>template</td>
+          <td>string</td>
+          <td>''</td>
+          <td>
+            <p>Provide an html template as a string (when templateUrl is falsy).</p>
+          </td>
+        </tr>
+        <tr>
+          <td>templateUrl</td>
           <td>path</td>
-          <td>false</td>
+          <td>'tooltip/tooltip.tpl.html'</td>
           <td>
             <p>If provided, overrides the default template, can be either a remote URL or a cached template id.</p>
             <p>It should be a <code>div.tooltip</code> element following Bootstrap styles conventions (<a href="//github.com/mgcrea/angular-strap/blob/master/src/tooltip/tooltip.tpl.html" target="_blank">like this</a>).</p>
           </td>
         </tr>
         <tr>
-          <td>contentTemplate</td>
+          <td>titleTemplate</td>
           <td>path</td>
           <td>false</td>
           <td>
@@ -155,7 +166,57 @@
           <td>string</td>
           <td>'tooltip'</td>
           <td>
-            <p>If provided, prefixes the events '.hide' '.hide.after' '.show' and '.show.after' with the passed in value. With the default value these events are 'tooltip.hide' 'tooltip.hide.after' 'tooltip.show' and 'tooltip.show.after'</p>
+            <p>If provided, prefixes the events '.hide.before' '.hide' '.show.before' and '.show' with the passed in value. With the default value these events are 'tooltip.hide.before' 'tooltip.hide' 'tooltip.show.before' and 'tooltip.show'</p>
+          </td>
+        </tr>
+        <tr>
+          <td>id</td>
+          <td>string</td>
+          <td>''</td>
+          <td>
+            The tooltip instance id for usage in event handlers.
+          </td>
+        </tr>
+        <tr>
+          <td>onShow</td>
+          <td>function</td>
+          <td></td>
+          <td>
+            <p>If provided, this function will be invoked after the tooltip is shown.</p>
+          </td>
+        </tr>
+        <tr>
+          <td>onBeforeShow</td>
+          <td>function</td>
+          <td></td>
+          <td>
+            <p>If provided, this function will be invoked before the tooltip is shown.</p>
+          </td>
+        </tr>
+        <tr>
+          <td>onHide</td>
+          <td>function</td>
+          <td></td>
+          <td>
+            <p>If provided, this function will be invoked after the tooltip is hidden.</p>
+          </td>
+        </tr>
+        <tr>
+          <td>onBeforeHide</td>
+          <td>function</td>
+          <td></td>
+          <td>
+            <p>If provided, this function will be invoked before the tooltip is hidden.</p>
+          </td>
+        </tr>
+        <tr>
+          <td>viewport</td>
+          <td>string | object</td>
+          <td>{ selector: 'body', padding: 0 }</td>
+          <td>
+            <p>
+              Keeps the tooltip within the bounds of this element. Example: viewport: '#viewport' or { "selector": "#viewport", "padding": 0 }
+            </p>
           </td>
         </tr>
       </tbody>
@@ -179,6 +240,41 @@
     </div>
   </div>
 
+  <h3>Helper attributes</h3>
+  <p>Helper attributes can be used together with the directive via data-attributes to support specific functionality. Helper attributes support data binding. To use helper attributes, append the helper attribute name to <code>data-</code>, as in <code>data-bs-show="true"</code>.</p>
+  <div class="table-responsive">
+    <table class="table table-bordered table-striped">
+      <thead>
+        <tr>
+          <th style="width: 100px;">Name</th>
+          <th style="width: 100px;">type</th>
+          <th style="width: 50px;">default</th>
+          <th>description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>bsShow</td>
+          <td>boolean | string</td>
+          <td>false</td>
+          <td>
+            <p>shows or hides the tooltip. Supports boolean values or "true"/"false" string values.</p>
+            <p>You can also specify "tooltip" to show just the tooltip when using several angular-strap directives on the same element.</p>
+          </td>
+        </tr>
+        <tr>
+          <td>bsEnabled</td>
+          <td>boolean | string</td>
+          <td>true</td>
+          <td>
+            <p>enables or disables the tooltip trigger. When the tooltip is disabled, calling show() will have no effect.</p>
+            <p>Supports boolean values or "true" "false" "1" "0" string values.</p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
   <h3>Scope methods</h3>
   <p>Methods available inside the directive scope to toggle visibility.</p>
 
@@ -191,4 +287,6 @@
   <h4>$toggle()</h4>
   <p>Toggles the tooltip.</p>
 
+  <h4>$setEnabled(isEnabled)</h4>
+  <p>Enables or disables the tooltip.</p>
 </div>

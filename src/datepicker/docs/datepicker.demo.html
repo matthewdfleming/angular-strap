@@ -43,11 +43,11 @@ $scope.untilDate = {{untilDate}}; // &lt;- {{ getType('untilDate') }}
       <!-- Date range example -->
       <div class="form-group">
         <label class="control-label"><i class="fa fa-calendar"></i> <i class="fa fa-arrows-h"></i> <i class="fa fa-calendar"></i> Date range <small>(dynamic)</small></label><br>
-        <div class="form-group" class="col-xs-3">
-          <input type="text" class="form-control" ng-model="fromDate"  data-max-date="{{untilDate}}" placeholder="From" bs-datepicker>
+        <div class="form-group col-xs-6">
+          <input type="text" class="form-control" ng-model="fromDate"  data-max-date="{{untilDate}}" placeholder="From" data-has-today="true" data-has-clear="true" bs-datepicker>
         </div>
-        <div class="form-group" class="col-xs-3">
-          <input type="text" class="form-control" ng-model="untilDate"  data-min-date="{{fromDate}}" placeholder="Until" bs-datepicker>
+        <div class="form-group col-xs-6">
+          <input type="text" class="form-control" ng-model="untilDate"  data-min-date="{{fromDate}}" placeholder="Until" data-has-today="true" data-has-clear="false" bs-datepicker>
         </div>
       </div>
     </form>
@@ -72,7 +72,7 @@ $scope.untilDate = {{untilDate}}; // &lt;- {{ getType('untilDate') }}
   <p>Options can be passed via data-attributes on the directive or as an object hash to configure the service. For data attributes, append the option name to <code>data-</code>, as in <code>data-animation=""</code>.</p>
   <div class="callout callout-info">
     <h4>This module supports exotic placement options!</h4>
-    <p>You can position your select in corners (such as <code>bottom-left</code>) or any other combination two.</p>
+    <p>You can position your datepicker in corners (such as <code>bottom-left</code>) or any other combination two.</p>
     <p>Exotic placement options are not part of the Bootstrap's core, to use them you must use <code>bootstrap-additions.css</code> from the <a href="//github.com/mgcrea/bootstrap-additions" target="_blank">BootstrapAdditions</a> project. This project being not yet fully released, meanwhile, you can use the <a href="//mgcrea.github.io/angular-strap/static/styles/bootstrap-additions.min.css" target="_blank">development snapshot</a> compiled for these docs.</p>
   </div>
   <div class="table-responsive">
@@ -96,13 +96,16 @@ $scope.untilDate = {{untilDate}}; // &lt;- {{ getType('untilDate') }}
           <td>placement</td>
           <td>string</td>
           <td>'bottom-left'</td>
-          <td>how to position the typeahead - top | bottom | left | right, or any combination like bottom-left.</td>
+          <td>
+            how to position the datepicker - top | bottom | left | right | auto, or any combination like bottom-left or auto bottom-left.<br>
+            When "auto" is specified, it will dynamically reorient the datepicker. For example, if placement is "auto left", the datepicker will display to the left when possible, otherwise it will display right.
+          </td>
         </tr>
         <tr>
           <td>trigger</td>
           <td>string</td>
           <td>'focus'</td>
-          <td>how typeahead is triggered - click | hover | focus | manual</td>
+          <td>how datepicker is triggered - click | hover | focus | manual</td>
         </tr>
         <tr>
           <td>html</td>
@@ -115,7 +118,7 @@ $scope.untilDate = {{untilDate}}; // &lt;- {{ getType('untilDate') }}
           <td>number | object</td>
           <td>0</td>
           <td>
-            <p>delay showing and hiding the typeahead (ms) - does not apply to manual trigger type</p>
+            <p>delay showing and hiding the datepicker (ms) - does not apply to manual trigger type</p>
             <p>If a number is supplied, delay is applied to both hide/show</p>
             <p>Object structure is:
               <code>delay: { show: 500, hide: 100 }</code>
@@ -127,16 +130,48 @@ $scope.untilDate = {{untilDate}}; // &lt;- {{ getType('untilDate') }}
           <td>string | false</td>
           <td>false</td>
           <td>
-            <p>Appends the typeahead to a specific element. Example:
-              <code>container: 'body'</code>. This option is particularly useful in that it allows you to position the typeahead in the flow of the document near the triggering element -&nbsp;which will prevent the typeahead from floating away from the triggering element during a window resize.</p>
+            <p>Appends the datepicker to a specific element. Example:
+              <code>container: 'body'</code>. This option is particularly useful in that it allows you to position the datepicker in the flow of the document near the triggering element -&nbsp;which will prevent the datepicker from floating away from the triggering element during a window resize.</p>
           </td>
         </tr>
         <tr>
           <td>template</td>
           <td>path | id</td>
-          <td>'$typeahead'</td>
+          <td>'$datepicker'</td>
           <td>
             <p>If provided, overrides the default template, can be either a remote URL or a cached template id.</p>
+          </td>
+        </tr>
+        <tr>
+          <td>onShow</td>
+          <td>function</td>
+          <td></td>
+          <td>
+            <p>If provided, this function will be invoked after the datepicker is shown.</p>
+          </td>
+        </tr>
+        <tr>
+          <td>onBeforeShow</td>
+          <td>function</td>
+          <td></td>
+          <td>
+            <p>If provided, this function will be invoked before the datepicker is shown.</p>
+          </td>
+        </tr>
+        <tr>
+          <td>onHide</td>
+          <td>function</td>
+          <td></td>
+          <td>
+            <p>If provided, this function will be invoked after the datepicker is hidden.</p>
+          </td>
+        </tr>
+        <tr>
+          <td>onBeforeHide</td>
+          <td>function</td>
+          <td></td>
+          <td>
+            <p>If provided, this function will be invoked before the datepicker is hidden.</p>
           </td>
         </tr>
         <tr>
@@ -148,11 +183,31 @@ $scope.untilDate = {{untilDate}}; // &lt;- {{ getType('untilDate') }}
           </td>
         </tr>
         <tr>
+          <td>modelDateFormat</td>
+          <td>string</td>
+          <td>null</td>
+          <td>
+            <p>Model format of your date, leverages <a href="http://docs.angularjs.org/api/ng.filter:date">ng.filter:date</a>. You should also set dateType to <code>string</code>
+            to use this option.</p>
+          </td>
+        </tr>
+        <tr>
           <td>dateType</td>
           <td>string</td>
           <td>'date'</td>
           <td>
-            <p>Expected model type of your date - date | number | iso | string</p>
+            <p>Expected model type of your date - date | number | unix | iso | string</p>
+
+            <p>If type is "number" then datepicker uses milliseconds to set date, if "unix" - seconds</p>
+          </td>
+        </tr>
+		<tr>
+          <td>timezone</td>
+          <td>string</td>
+          <td>null</td>
+          <td>
+            <p>Timezone of your date - null, UTC</p>
+            <p>"UTC" for UTC or null for local timezone.</p>
           </td>
         </tr>
         <tr>
@@ -176,7 +231,7 @@ $scope.untilDate = {{untilDate}}; // &lt;- {{ getType('untilDate') }}
           <td>date*</td>
           <td>-Infinity</td>
           <td>
-            <p>Minimum allowed date for selection <small>(* fed into the <code>Date</code> constructor)</small>. You can use the string "today" that will resolve the current date.</p>
+            <p>Minimum allowed date for selection <small>(* fed into the <code>Date</code> constructor)</small>. You can set this to the current date by passing the string "today" into the 'data-min-date' attribute, or by setting minDate to <code>new Date()</code> when configuring the provider defaults.</p>
           </td>
         </tr>
         <tr>
@@ -184,7 +239,7 @@ $scope.untilDate = {{untilDate}}; // &lt;- {{ getType('untilDate') }}
           <td>date*</td>
           <td>+Infinity</td>
           <td>
-            <p>Maximum allowed date for selection <small>(* fed into the <code>Date</code> constructor)</small>. You can use the string "today" that will resolve the current date.</p>
+            <p>Maximum allowed date for selection <small>(* fed into the <code>Date</code> constructor)</small>. You can set this to the current date by passing the string "today" into the 'data-max-date' attribute, or by setting maxDate to <code>new Date()</code> when configuring the provider defaults.</p>
           </td>
         </tr>
         <tr>
@@ -206,9 +261,9 @@ $scope.untilDate = {{untilDate}}; // &lt;- {{ getType('untilDate') }}
         <tr>
           <td>startWeek</td>
           <td>number</td>
-          <td>1</td>
+          <td>0</td>
           <td>
-            <p>First day of the week.</p>
+            <p>First day of the week (0 - Sunday, 1 - Monday, 2 - Tuesday, etc.)</p>
           </td>
         </tr>
         <tr>
@@ -216,7 +271,7 @@ $scope.untilDate = {{untilDate}}; // &lt;- {{ getType('untilDate') }}
           <td>date*</td>
           <td>today</td>
           <td>
-            <p>Date that sould be opened by default.</p>
+            <p>Date that should be opened by default.</p>
           </td>
         </tr>
         <tr>
@@ -241,6 +296,31 @@ $scope.untilDate = {{untilDate}}; // &lt;- {{ getType('untilDate') }}
           <td>''</td>
           <td>
             <p>List of decimal days of the week values that are disabled and hence cannot be selected. For example, '06' disables Sunday and Saturday, '12345' disables Monday to Friday.</p>
+          </td>
+        </tr>
+        <tr>
+          <td>disabledDates</td>
+          <td>array of date ranges</td>
+          <td>[]</td>
+          <td>
+            <p>Array of date ranges to disable.</p>
+            <p>Example date range: <code>{ start: new Date(2010, 11, 24), end: new Date(2010, 11, 25) }</code></p>
+          </td>
+        </tr>
+        <tr>
+          <td>hasToday</td>
+          <td>boolean</td>
+          <td>false</td>
+          <td>
+            <p>Whether the picker has Today button.</p>
+          </td>
+        </tr>
+        <tr>
+          <td>hasClear</td>
+          <td>boolean</td>
+          <td>false</td>
+          <td>
+            <p>Whether the picker has Clear button.</p>
           </td>
         </tr>
       </tbody>
